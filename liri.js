@@ -1,5 +1,5 @@
 require("dotenv").config();
-
+var fs = require("fs")
 var keys = require("./keys.js");
 var axios = require("axios")
 var moment = require("moment")
@@ -7,9 +7,7 @@ var Spotify =  require("node-spotify-api")
 var spotify = new Spotify(keys.spotify);
 var search = process.argv[2]
 var searchTerm = process.argv[3]
-if (searchTerm == null){
-  searchTerm = "The sign"
-}
+
 
 switch(search) {
   case "concert-this": 
@@ -17,6 +15,12 @@ switch(search) {
     break;
   case "spotify-this-song":
     spotifyThisSong();
+    break;
+  case "movie-this":
+    movieThis();
+    break;
+  case "do-what-it-says":
+    doWhatItSays();
     break;
   }
 
@@ -64,11 +68,15 @@ function concertThis(search){
 
 
 function spotifyThisSong(search) {
+//  var type = "track"
+  if (!searchTerm){
+    searchTerm = "the sign ace of base"
+   
+  }
   spotify
   .search({
            type: "track",
-           query: searchTerm
-         
+           query: searchTerm,
        })
        .then(function (response) {
          var title = response.tracks.items;
@@ -92,3 +100,70 @@ function spotifyThisSong(search) {
        });
 }
 
+
+
+function movieThis() {
+
+  for (var i = 3; i < searchTerm.length; i++) {
+
+    if (i > 3 && i < nodeArgs.length) {
+      movieName = movieName + "+" + nodeArgs[i];
+    } else {
+      movieName += nodeArgs[i];
+  
+    }
+  }
+  
+
+  if (!searchTerm){
+    searchTerm = "Mr. Nobody"
+  }
+  axios.get("http://www.omdbapi.com/?t="+ searchTerm +"&y=&plot=short&apikey=trilogy").then(
+  function(response) {
+    // console.log("response: ", response.data);
+console.log("Title of the movie: ", response.data.Title);
+console.log("Year the movie came out: ", response.data.Year);
+console.log("IMDB Rating of the movie: ", response.data.Ratings[0].Value);
+console.log("Rotten Tomatoes Rating of the movie: ", response.data.Ratings[1].Value);
+console.log("Country where the movie was produced: ", response.data.Country);
+console.log("Language of the movie: ", response.data.Language);
+console.log("Plot of the movie: ", response.data.Plot);
+console.log("Actors in the movie: ", response.data.Actors);
+
+
+  })
+  .catch(function(error) {
+    if ("error?:", error.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      console.log("---------------Data---------------");
+      console.log(error.response.data);
+      console.log("---------------Status---------------");
+      console.log(error.response.status);
+      console.log("---------------Status---------------");
+      console.log(error.response.headers);
+    } else if (error.request) {
+      // The request was made but no response was received
+      // `error.request` is an object that comes back with details pertaining to the error that occurred.
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log("Error", error.message);
+    }
+    console.log(error.config);
+  });
+}
+
+function doWhatItSays() {
+  fs.readFile("random.txt", "utf-8", function(error,data){
+    if(error){
+      return console.log(error);
+    }
+  //  console.log("data:", data);
+  var dataSplit = data.split(",")
+  console.log("data split: ",dataSplit);
+  search = dataSplit[0]
+  searchTerm = dataSplit[1]
+  spotifyThisSong(search,searchTerm)
+  })
+}
