@@ -106,10 +106,10 @@ function movieThis() {
 
   for (var i = 3; i < searchTerm.length; i++) {
 
-    if (i > 3 && i < nodeArgs.length) {
-      movieName = movieName + "+" + nodeArgs[i];
+    if (i > 3 && i < searchTerm.length) {
+      search = search + "+" + searchTerm[i];
     } else {
-      movieName += nodeArgs[i];
+      search += searchTerm[i];
   
     }
   }
